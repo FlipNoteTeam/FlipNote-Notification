@@ -10,13 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import lombok.RequiredArgsConstructor;
 
 @Converter
-@RequiredArgsConstructor
 public class MapToJsonConverter implements AttributeConverter<Map<String, Object>, String> {
 
-	private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public String convertToDatabaseColumn(Map<String, Object> attribute) {

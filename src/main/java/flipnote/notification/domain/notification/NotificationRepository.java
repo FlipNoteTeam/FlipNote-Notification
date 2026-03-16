@@ -5,18 +5,39 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface NotificationRepository {
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-	Notification save(Notification notification);
-
-	List<Notification> saveAll(List<Notification> notifications);
-
-	Optional<Notification> findByIdAndReceiverId(Long id, Long receiverId);
-
+	@Query("""
+		SELECT n FROM Notification n
+		WHERE (:cursor IS NULL OR n.id < :cursor)
+		AND (:groupId IS NULL OR n.groupId = :groupId)
+		AND (:read IS NULL OR n.read = :read)
+		AND n.receiverId = :receiverId
+		""")
 	List<Notification> findNotificationsByReceiverIdAndCursor(
-		Long receiverId, Long cursor, Long groupId, Boolean read, Pageable pageable
+		@Param("receiverId") Long receiverId,
+		@Param("cursor") Long cursor,
+		@Param("groupId") Long groupId,
+		@Param("read") Boolean read,
+		Pageable pageable
 	);
 
-	int bulkMarkAsRead(Long userId, LocalDateTime now);
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("""
+		UPDATE Notification n
+		SET n.read = TRUE, n.readAt = :now
+		WHERE n.receiverId = :userId
+		AND n.read is FALSE
+		""")
+	int bulkMarkAsRead(
+		@Param("userId") Long userId,
+		@Param("now") LocalDateTime now
+	);
+
+	Optional<Notification> findByIdAndReceiverId(Long id, Long receiverId);
 }
