@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import flipnote.notification.common.response.ApiResponse;
-import flipnote.notification.interfaces.security.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,17 +26,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(exception.getErrorCode().getStatus())
 			.body(ApiResponse.error(exception.getErrorCode()));
-	}
-
-	@ExceptionHandler(UnauthorizedException.class)
-	public ResponseEntity<ApiResponse<Void>> handleUnauthorized(UnauthorizedException exception) {
-		return ResponseEntity
-			.status(401)
-			.body(ApiResponse.<Void>builder()
-				.status(401)
-				.code("AUTH_001")
-				.message(exception.getMessage())
-				.build());
 	}
 
 	@ExceptionHandler(Exception.class)

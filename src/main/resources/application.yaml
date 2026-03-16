@@ -42,3 +42,24 @@ app:
 springdoc:
   server:
     url: ${SPRINGDOC_SERVER_URL:http://localhost:8086}
+  swagger-ui:
+    path: /notifications/swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /notifications/v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

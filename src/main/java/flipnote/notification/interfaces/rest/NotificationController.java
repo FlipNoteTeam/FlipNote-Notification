@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,9 +18,8 @@ import flipnote.notification.application.service.FcmTokenService;
 import flipnote.notification.application.service.NotificationCommandService;
 import flipnote.notification.application.service.NotificationQueryService;
 import flipnote.notification.common.response.CursorPagingResponse;
+import flipnote.notification.common.HttpHeaders;
 import flipnote.notification.interfaces.rest.docs.NotificationControllerDocs;
-import flipnote.notification.interfaces.security.AuthenticatedUser;
-import flipnote.notification.interfaces.security.CurrentUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,10 +36,10 @@ public class NotificationController implements NotificationControllerDocs {
 	@GetMapping
 	public ResponseEntity<CursorPagingResponse<NotificationResponse>> getNotifications(
 		@Valid @ModelAttribute NotificationListRequest req,
-		@CurrentUser AuthenticatedUser user
+		@RequestHeader(HttpHeaders.USER_ID) Long userId
 	) {
 		CursorPagingResponse<NotificationResponse> res
-			= notificationQueryService.getNotifications(user.userId(), req);
+			= notificationQueryService.getNotifications(userId, req);
 
 		return ResponseEntity.ok(res);
 	}
@@ -48,9 +48,9 @@ public class NotificationController implements NotificationControllerDocs {
 	@PostMapping("/token")
 	public ResponseEntity<Void> registerFcmToken(
 		@Valid @RequestBody TokenRegisterRequest req,
-		@CurrentUser AuthenticatedUser user
+		@RequestHeader(HttpHeaders.USER_ID) Long userId
 	) {
-		fcmTokenService.registerFcmToken(user.userId(), req);
+		fcmTokenService.registerFcmToken(userId, req);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -58,9 +58,9 @@ public class NotificationController implements NotificationControllerDocs {
 	@Override
 	@PostMapping("/read-all")
 	public ResponseEntity<Void> markAllNotificationsAsRead(
-		@CurrentUser AuthenticatedUser user
+		@RequestHeader(HttpHeaders.USER_ID) Long userId
 	) {
-		notificationCommandService.markAllNotificationsAsRead(user.userId());
+		notificationCommandService.markAllNotificationsAsRead(userId);
 
 		return ResponseEntity.ok().build();
 	}
@@ -69,9 +69,9 @@ public class NotificationController implements NotificationControllerDocs {
 	@PostMapping("/{notificationId}/read")
 	public ResponseEntity<Void> markNotificationAsRead(
 		@PathVariable("notificationId") Long notificationId,
-		@CurrentUser AuthenticatedUser user
+		@RequestHeader(HttpHeaders.USER_ID) Long userId
 	) {
-		notificationCommandService.markNotificationAsRead(user.userId(), notificationId);
+		notificationCommandService.markNotificationAsRead(userId, notificationId);
 
 		return ResponseEntity.ok().build();
 	}
