@@ -14,7 +14,7 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class SwaggerConfig {
 
-	@Value("${springdoc.server.url:http://localhost:8081}")
+	@Value("${springdoc.server.url:http://localhost:8086}")
 	private String serverUrl;
 
 	@Bean

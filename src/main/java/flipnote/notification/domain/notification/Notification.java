@@ -46,9 +46,9 @@ public class Notification extends BaseEntity {
 	private Map<String, Object> metadata;
 
 	@Column(name = "is_read", nullable = false)
-	boolean read;
+	private boolean read;
 
-	LocalDateTime readAt;
+	private LocalDateTime readAt;
 
 	@Builder
 	public Notification(
